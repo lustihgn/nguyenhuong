@@ -1,75 +1,74 @@
-// ================== NHẠC ==================
+// ===== NHẠC =====
 const bgm = document.getElementById("bgm");
-let musicStarted = false;
 
 function startMusic() {
-  if (musicStarted) return;
   bgm.volume = 0.5;
-  bgm.play().then(() => {
-    musicStarted = true;
-  }).catch(() => {});
+  bgm.play().catch(() => {});
+  document.removeEventListener("click", startMusic);
+  document.removeEventListener("touchstart", startMusic);
 }
 
-document.addEventListener("pointerdown", startMusic, { once: true });
+document.addEventListener("click", startMusic);
+document.addEventListener("touchstart", startMusic);
 
 
-// ================== VẬT RƠI ==================
-const tetItems = ["🎆", "✨", "🎇", "🌟"];
+// ===== SAO + POPUP =====
+const stars = ["⭐","🌟","✨","💫","🌠","✦","✧"];
 
 const cards = [
-  { img: "tet1.jpg", text: "Chúc bạn năm mới 2026 phát tài phát lộc!" },
-  { img: "tet2.jpg", text: "Xuân an khang – Gia đình hạnh phúc!" },
-  { img: "tet3.jpg", text: "Tết rộn ràng – Niềm vui ngập tràn!" }
+  { img:"anh1.jpg", text:"💛Chúc chin gái năm mới sẽ có thêm thật là nhiều niềm vui 💛" },
+  { img:"anh2.jpg", text:"❤️‍🩹Năm mới mong chị sẽ luôn được bình an và nhẹ lòng❤️‍🩹" },
+  { img:"anh3.jpg", text:"😍Chúc chị sang năm mới sẽ ngày càng xinh đẹp hơn cả 😍" },
+  { img:"anh4.jpg", text:"🍀Mong rằng sang năm mới sẽ có thật nhiều sự may mắn và tốt đẹp tới với chị🍀" },
+  { img:"anh5.jpg", text:"💕Mong chị sẽ luôn nhận được sự yêu thương và trân trọng 💕" },
+  { img:"anh6.jpg", text:"☁️Chúc cho chị có một năm nhẹ nhàng và ít phải lo nghĩ nhe ☁️" },
+  { img:"anh7.jpg", text:"💜Mong cho chị có một năm thật thuận lợi và hạnh phúc 💜" }
 ];
 
-// preload ảnh để tránh lag
-window.addEventListener("load", () => {
-  cards.forEach(c => {
-    const img = new Image();
-    img.src = c.img;
-  });
+// preload ảnh
+cards.forEach(card => {
+  const img = new Image();
+  img.src = card.img;
 });
 
-let lastIndex = -1;
+let currentIndex = 0;
 
 const popup = document.getElementById("popup");
 const popupImg = document.getElementById("popup-img");
 const popupText = document.getElementById("popup-text");
-const popupContent = document.querySelector(".popup-content");
 
-function createTetItem() {
-  const item = document.createElement("div");
-  item.className = "flower";
-  item.textContent = tetItems[Math.floor(Math.random() * tetItems.length)];
-  item.style.left = Math.random() * window.innerWidth + "px";
-  item.style.animationDuration = 8 + Math.random() * 3 + "s";
+function createStar() {
+  const star = document.createElement("div");
+  star.className = "star";
+  star.textContent = stars[Math.floor(Math.random()*stars.length)];
 
-  item.onclick = () => {
-    let i;
-    do {
-      i = Math.floor(Math.random() * cards.length);
-    } while (i === lastIndex);
-    lastIndex = i;
+  star.style.left = Math.random()*window.innerWidth + "px";
+  star.style.fontSize = (24 + Math.random()*20) + "px";
+  star.style.animationDuration = (6 + Math.random()*4) + "s";
 
-    popupImg.classList.remove("show");
-    popupImg.src = cards[i].img;
-    popupText.innerText = cards[i].text;
+  star.onclick = () => {
+    popupImg.src = cards[currentIndex].img;
+    popupText.innerText = cards[currentIndex].text;
     popup.style.display = "flex";
 
-    setTimeout(() => popupImg.classList.add("show"), 50);
+    currentIndex++;
+    if(currentIndex >= cards.length){
+      currentIndex = 0;
+    }
   };
 
-  document.body.appendChild(item);
-  setTimeout(() => item.remove(), 13000);
+  document.body.appendChild(star);
+  setTimeout(() => star.remove(), 12000);
 }
 
-setInterval(createTetItem, 1000);
+setInterval(createStar, 700);
 
-popup.onclick = () => popup.style.display = "none";
-popupContent.onclick = e => e.stopPropagation();
+popup.onclick = () => {
+  popup.style.display = "none";
+};
 
 
-// ================== PHÁO HOA ==================
+// ===== PHÁO HOA =====
 const canvas = document.getElementById("fireworks");
 const ctx = canvas.getContext("2d");
 
@@ -82,36 +81,36 @@ addEventListener("resize", resize);
 
 class Firework {
   constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height * 0.6;
+    this.x = Math.random()*canvas.width;
+    this.y = Math.random()*canvas.height*0.6;
     this.particles = [];
-    this.color = `hsla(${Math.random() * 360},80%,65%,0.8)`;
+    this.color = `hsla(${Math.random()*360},80%,65%,0.8)`;
 
-    for (let i = 0; i < 18; i++) {
+    for(let i=0;i<20;i++){
       this.particles.push({
-        x: this.x,
-        y: this.y,
-        a: Math.random() * Math.PI * 2,
-        s: Math.random() * 1.4 + 0.4,
-        l: 60
+        x:this.x,
+        y:this.y,
+        a:Math.random()*Math.PI*2,
+        s:Math.random()*1.5+0.5,
+        l:60
       });
     }
   }
 
-  update() {
-    this.particles.forEach(p => {
-      p.x += Math.cos(p.a) * p.s;
-      p.y += Math.sin(p.a) * p.s;
+  update(){
+    this.particles.forEach(p=>{
+      p.x+=Math.cos(p.a)*p.s;
+      p.y+=Math.sin(p.a)*p.s;
       p.l--;
     });
-    this.particles = this.particles.filter(p => p.l > 0);
+    this.particles=this.particles.filter(p=>p.l>0);
   }
 
-  draw() {
-    this.particles.forEach(p => {
+  draw(){
+    this.particles.forEach(p=>{
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = this.color;
+      ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
+      ctx.fillStyle=this.color;
       ctx.fill();
     });
   }
@@ -119,22 +118,17 @@ class Firework {
 
 let fireworks = [];
 
-function animate() {
-  ctx.fillStyle = "rgba(0,0,20,0.2)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+function animate(){
+  ctx.fillStyle="rgba(0,0,20,0.2)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  if (Math.random() < 0.03) {
-    fireworks.push(new Firework());
-  }
+  if(Math.random()<0.04) fireworks.push(new Firework());
 
-  for (let i = fireworks.length - 1; i >= 0; i--) {
-    const f = fireworks[i];
+  fireworks.forEach((f,i)=>{
     f.update();
     f.draw();
-    if (f.particles.length === 0) {
-      fireworks.splice(i, 1);
-    }
-  }
+    if(!f.particles.length) fireworks.splice(i,1);
+  });
 
   requestAnimationFrame(animate);
 }
