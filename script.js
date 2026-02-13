@@ -17,15 +17,15 @@ const tetItems = ["🎆", "✨", "🎇", "🌟"];
 
 const cards = [
   {
-    img: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=600&q=80",
+    img: "tet1.jpg",
     text: "Chúc bạn năm mới 2026 phát tài phát lộc!"
   },
   {
-    img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80",
+    img: "tet2.jpg",
     text: "Xuân an khang – Gia đình hạnh phúc!"
   },
   {
-    img: "https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=600&q=80",
+    img: "tet3.jpg",
     text: "Tết rộn ràng – Niềm vui ngập tràn!"
   }
 ];
