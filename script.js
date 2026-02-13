@@ -1,36 +1,37 @@
-// ===== NHẠC NỀN =====
+// ================== NHẠC ==================
 const bgm = document.getElementById("bgm");
+let musicStarted = false;
 
 function startMusic() {
+  if (musicStarted) return;
   bgm.volume = 0.5;
-  bgm.play().catch(() => {});
-  document.removeEventListener("click", startMusic);
-  document.removeEventListener("touchstart", startMusic);
+  bgm.play().then(() => {
+    musicStarted = true;
+  }).catch(() => {});
 }
 
-// Phát nhạc khi người dùng chạm lần đầu
-document.addEventListener("click", startMusic);
-document.addEventListener("touchstart", startMusic);
+document.addEventListener("pointerdown", startMusic, { once: true });
 
-// ===== VẬT RƠI + POPUP =====
+
+// ================== VẬT RƠI ==================
 const tetItems = ["🎆", "✨", "🎇", "🌟"];
 
 const cards = [
-  {
-    img: "tet1.jpg",
-    text: "Chúc bạn năm mới 2026 phát tài phát lộc!"
-  },
-  {
-    img: "tet2.jpg",
-    text: "Xuân an khang – Gia đình hạnh phúc!"
-  },
-  {
-    img: "tet3.jpg",
-    text: "Tết rộn ràng – Niềm vui ngập tràn!"
-  }
+  { img: "tet1.jpg", text: "Chúc bạn năm mới 2026 phát tài phát lộc!" },
+  { img: "tet2.jpg", text: "Xuân an khang – Gia đình hạnh phúc!" },
+  { img: "tet3.jpg", text: "Tết rộn ràng – Niềm vui ngập tràn!" }
 ];
 
+// preload ảnh để tránh lag
+window.addEventListener("load", () => {
+  cards.forEach(c => {
+    const img = new Image();
+    img.src = c.img;
+  });
+});
+
 let lastIndex = -1;
+
 const popup = document.getElementById("popup");
 const popupImg = document.getElementById("popup-img");
 const popupText = document.getElementById("popup-text");
@@ -45,13 +46,14 @@ function createTetItem() {
 
   item.onclick = () => {
     let i;
-    do { i = Math.floor(Math.random() * cards.length); }
-    while (i === lastIndex);
+    do {
+      i = Math.floor(Math.random() * cards.length);
+    } while (i === lastIndex);
     lastIndex = i;
 
     popupImg.classList.remove("show");
     popupImg.src = cards[i].img;
-    popupText.innerHTML = cards[i].text;
+    popupText.innerText = cards[i].text;
     popup.style.display = "flex";
 
     setTimeout(() => popupImg.classList.add("show"), 50);
@@ -66,7 +68,8 @@ setInterval(createTetItem, 1000);
 popup.onclick = () => popup.style.display = "none";
 popupContent.onclick = e => e.stopPropagation();
 
-// ===== PHÁO HOA =====
+
+// ================== PHÁO HOA ==================
 const canvas = document.getElementById("fireworks");
 const ctx = canvas.getContext("2d");
 
@@ -84,12 +87,12 @@ class Firework {
     this.particles = [];
     this.color = `hsla(${Math.random() * 360},80%,65%,0.8)`;
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 18; i++) {
       this.particles.push({
         x: this.x,
         y: this.y,
         a: Math.random() * Math.PI * 2,
-        s: Math.random() * 1.5 + 0.5,
+        s: Math.random() * 1.4 + 0.4,
         l: 60
       });
     }
@@ -120,14 +123,20 @@ function animate() {
   ctx.fillStyle = "rgba(0,0,20,0.2)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  if (Math.random() < 0.03) fireworks.push(new Firework());
+  if (Math.random() < 0.03) {
+    fireworks.push(new Firework());
+  }
 
-  fireworks.forEach((f, i) => {
+  for (let i = fireworks.length - 1; i >= 0; i--) {
+    const f = fireworks[i];
     f.update();
     f.draw();
-    if (!f.particles.length) fireworks.splice(i, 1);
-  });
+    if (f.particles.length === 0) {
+      fireworks.splice(i, 1);
+    }
+  }
 
   requestAnimationFrame(animate);
 }
+
 animate();
