@@ -1,133 +1,182 @@
-// ===== NHẠC =====
+// ================== NHẠC ==================
 const bgm = document.getElementById("bgm");
 
 function startMusic() {
   bgm.volume = 0.5;
-  bgm.play().catch(() => {});
+  bgm.play().catch(()=>{});
   document.removeEventListener("click", startMusic);
-  document.removeEventListener("touchstart", startMusic);
 }
 
 document.addEventListener("click", startMusic);
-document.addEventListener("touchstart", startMusic);
 
 
-// ===== SAO + POPUP =====
-const stars = ["⭐","🌟","✨","💫","🌠","✦","✧"];
-
+// ================== SAO RƠI ==================
+const icons = ["⭐","🌟","✨","☆","★","✧","✦","⋆"];
 const cards = [
-  { img:"anh1.jpg", text:"❤️Chúc Hường năm mới sẽ có thêm thật là nhiều niềm vui ❤️" },
-  { img:"anh2.jpg", text:"❤️‍🩹Năm mới mong chị Hường sẽ luôn được bình an và nhẹ lòng❤️‍🩹" },
-  { img:"anh3.jpg", text:"😍Chúc chị Hường sang năm mới sẽ ngày càng xinh đẹp hơn cả 😍" },
+  { img:"anh1.jpg", text:"❤️Chúc chị Hoa năm mới sẽ có thêm thật là nhiều niềm vui ❤️" },
+  { img:"anh2.jpg", text:"❤️‍🩹Năm mới mong chị sẽ luôn được bình an và nhẹ lòng❤️‍🩹" },
+  { img:"anh3.jpg", text:"😍Chúc chị Hoa sang năm mới sẽ ngày càng xinh đẹp hơn cả 😍" },
   { img:"anh4.jpg", text:"🍀Mong rằng sang năm mới sẽ có thật nhiều sự may mắn và tốt đẹp tới với chị🍀" },
-  { img:"anh5.jpg", text:"💕Mong chị sẽ luôn nhận được sự yêu thương và trân trọng 💕" },
-  { img:"anh6.jpg", text:"☁️Chúc cho Hường có một năm nhẹ nhàng và ít phải lo nghĩ nhe ☁️" },
-  { img:"anh7.jpg", text:"💜Mong cho chị có một năm thật thuận lợi và hạnh phúc 💜" }
+  { img:"anh5.jpg", text:"💕Mong chị Hoa sẽ luôn nhận được sự yêu thương và trân trọng 💕" },
+  { img:"anh6.jpg", text:"☁️Chúc cho chị Hoa có một năm nhẹ nhàng và ít phải lo nghĩ nhe ☁️" },
+  { img:"anh7.jpg", text:"💜Mong cho chị có một năm thật thuận lợi và hạnh phúc 💜"}
 ];
 
-// preload ảnh
-cards.forEach(card => {
-  const img = new Image();
-  img.src = card.img;
-});
-
-let currentIndex = 0;
+let index = 0;
 
 const popup = document.getElementById("popup");
 const popupImg = document.getElementById("popup-img");
 const popupText = document.getElementById("popup-text");
 
-function createStar() {
-  const star = document.createElement("div");
-  star.className = "star";
-  star.textContent = stars[Math.floor(Math.random()*stars.length)];
-
-  star.style.left = Math.random()*window.innerWidth + "px";
-  star.style.fontSize = (24 + Math.random()*20) + "px";
-  star.style.animationDuration = (6 + Math.random()*4) + "s";
-
-  star.onclick = () => {
-    popupImg.src = cards[currentIndex].img;
-    popupText.innerText = cards[currentIndex].text;
-    popup.style.display = "flex";
-
-    currentIndex++;
-    if(currentIndex >= cards.length){
-      currentIndex = 0;
-    }
-  };
-
-  document.body.appendChild(star);
-  setTimeout(() => star.remove(), 12000);
+function showCard(){
+  popupImg.src = cards[index].img;
+  popupText.innerText = cards[index].text;
+  popup.style.display = "flex";
+  index = (index + 1) % cards.length;
 }
 
-setInterval(createStar, 700);
+function createStar(){
+  const star = document.createElement("div");
+  star.className="star";
+  star.textContent = icons[Math.floor(Math.random()*icons.length)];
+  star.style.left = Math.random()*window.innerWidth+"px";
+  star.style.fontSize = (20+Math.random()*20)+"px";
+  star.style.animationDuration = (5+Math.random()*4)+"s";
+  star.onclick = showCard;
+  document.body.appendChild(star);
+  setTimeout(()=>star.remove(),9000);
+}
 
-popup.onclick = () => {
-  popup.style.display = "none";
-};
+setInterval(createStar,700);
+
+popup.onclick=()=>popup.style.display="none";
 
 
-// ===== PHÁO HOA =====
+// ================== PHÁO HOA ==================
 const canvas = document.getElementById("fireworks");
 const ctx = canvas.getContext("2d");
 
-function resize() {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+function resize(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 resize();
-addEventListener("resize", resize);
+window.addEventListener("resize",resize);
 
-class Firework {
-  constructor() {
-    this.x = Math.random()*canvas.width;
-    this.y = Math.random()*canvas.height*0.6;
-    this.particles = [];
-    this.color = `hsla(${Math.random()*360},80%,65%,0.8)`;
-
-    for(let i=0;i<20;i++){
-      this.particles.push({
-        x:this.x,
-        y:this.y,
-        a:Math.random()*Math.PI*2,
-        s:Math.random()*1.5+0.5,
-        l:60
-      });
-    }
+class Particle{
+  constructor(x,y,vx,vy,color){
+    this.x=x;
+    this.y=y;
+    this.vx=vx;
+    this.vy=vy;
+    this.life=100;
+    this.color=color;
   }
-
   update(){
-    this.particles.forEach(p=>{
-      p.x+=Math.cos(p.a)*p.s;
-      p.y+=Math.sin(p.a)*p.s;
-      p.l--;
-    });
-    this.particles=this.particles.filter(p=>p.l>0);
+    this.x+=this.vx;
+    this.y+=this.vy;
+    this.vy+=0.03;
+    this.vx*=0.99;
+    this.vy*=0.99;
+    this.life--;
   }
-
   draw(){
-    this.particles.forEach(p=>{
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
-      ctx.fillStyle=this.color;
-      ctx.fill();
-    });
+    ctx.globalAlpha=this.life/100;
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,2,0,Math.PI*2);
+    ctx.fillStyle=this.color;
+    ctx.fill();
+    ctx.globalAlpha=1;
   }
 }
 
-let fireworks = [];
+let particles=[];
+
+function explode(x,y){
+  const color=`hsl(${Math.random()*360},100%,60%)`;
+  const type=Math.floor(Math.random()*4);
+
+  if(type===0) circleShape(x,y,color);
+  else if(type===1) heartShape(x,y,color);
+  else if(type===2) starShape(x,y,color);
+  else flowerShape(x,y,color);
+}
+
+function circleShape(x,y,color){
+  const count=100;
+  for(let i=0;i<count;i++){
+    const angle=(Math.PI*2/count)*i;
+    const speed=3+Math.random()*2;
+    particles.push(new Particle(
+      x,y,
+      Math.cos(angle)*speed,
+      Math.sin(angle)*speed,
+      color
+    ));
+  }
+}
+
+function heartShape(x,y,color){
+  for(let t=0;t<Math.PI*2;t+=0.05){
+    const hx=16*Math.pow(Math.sin(t),3);
+    const hy=13*Math.cos(t)
+            -5*Math.cos(2*t)
+            -2*Math.cos(3*t)
+            -Math.cos(4*t);
+    particles.push(new Particle(
+      x,y,
+      hx*0.25,
+      -hy*0.25,
+      color
+    ));
+  }
+}
+
+function starShape(x,y,color){
+  const spikes=5;
+  const outer=5;
+  const inner=2.5;
+  for(let i=0;i<spikes*2;i++){
+    const r=i%2===0?outer:inner;
+    const angle=(Math.PI*i)/spikes;
+    particles.push(new Particle(
+      x,y,
+      Math.cos(angle)*r,
+      Math.sin(angle)*r,
+      color
+    ));
+  }
+}
+
+function flowerShape(x,y,color){
+  const petals=8;
+  for(let i=0;i<petals;i++){
+    const angle=(Math.PI*2/petals)*i;
+    for(let r=0;r<4;r++){
+      particles.push(new Particle(
+        x,y,
+        Math.cos(angle)*(r+1)*1.5,
+        Math.sin(angle)*(r+1)*1.5,
+        color
+      ));
+    }
+  }
+}
 
 function animate(){
-  ctx.fillStyle="rgba(0,0,20,0.2)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  if(Math.random()<0.04) fireworks.push(new Firework());
+  if(Math.random()<0.05){
+    explode(
+      Math.random()*canvas.width,
+      Math.random()*canvas.height*0.6
+    );
+  }
 
-  fireworks.forEach((f,i)=>{
-    f.update();
-    f.draw();
-    if(!f.particles.length) fireworks.splice(i,1);
+  particles.forEach((p,i)=>{
+    p.update();
+    p.draw();
+    if(p.life<=0) particles.splice(i,1);
   });
 
   requestAnimationFrame(animate);
